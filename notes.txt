@@ -1,0 +1,19 @@
+Clesius to kelvin = k = c + 273.15
+kelvin to Clesius = c = k - 273.15
+
+farenheight to Clesius = C = (f-32)(5/9)
+Clesius to farenheight = F = C(9/5) + 32
+
+farenheight to kelvin = k = (f-32)(5/9) + 273.15
+kelvin to farenheight = F = (k-273.15)(9/5) + 32
+
+Use classes like main, conversion, data, climate
+
+Could expand beyond csv to pdf 
+add some cool stuff
+
+On 9/13 issues on testing the graph which was set to self and not parent this 
+does not work because I already called the correct parent in frame2
+in fact it was more tban a frame issue it was a the matplot libarary that was also causing problems!
+Using https://www.geeksforgeeks.org/python/dropdown-menus-tkinter/
+
