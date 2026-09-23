@@ -17,3 +17,11 @@ does not work because I already called the correct parent in frame2
 in fact it was more tban a frame issue it was a the matplot libarary that was also causing problems!
 Using https://www.geeksforgeeks.org/python/dropdown-menus-tkinter/
 
+
+Had to change the class from conversion to simulator because the function in my thing can not function with the conv and 
+I do not know how to change it. Will make some kind of simulator other than climkate change that relates to tempeture
+
+
+Some more things about the graphs would default plots like sea level and co2 leveks
+tempeture Ice and the metrics it will be in 
+9/17

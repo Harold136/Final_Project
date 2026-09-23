@@ -8,8 +8,10 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
-class Conversions():
+class simulator():
     pass
+
+    
 def convert_temperature(value, from_unit, to_unit):
     if from_unit == to_unit:
         return value
@@ -32,17 +34,18 @@ def convert_temperature(value, from_unit, to_unit):
     
 
 
-class Graphs:
-   def test(self, parent):
-       fig = plt.Figure(figsize=(9, 6), dpi=100)
-       ax = fig.add_subplot(111)
-       x = [1, 2, 3, 4, 5]
-       y = [1, 4, 9, 16, 25]
-       ax.plot(x, y)
-       canvas = FigureCanvasTkAgg(fig, master=parent)
-       canvas.draw()
-       canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-       return canvas
+class climate_change_graphs:
+   def create_graph(self, parent, x_data, y_data, title, x_label, y_label):
+        fig = plt.Figure(figsize=(9, 6), dpi=100)
+        ax = fig.add_subplot(111)
+        
+        x_data = [1,2,3]
+        y_data = [1,4,9]
+        ax.plot(x_data, y_data)
+        canvas = FigureCanvasTkAgg(fig, master=parent)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        return canvas
     
        
 
@@ -67,7 +70,7 @@ class Main(tk.Tk):
         notebook.add(frame2, text="Graphs and climate simulator")
         notebook.add(frame3, text="Sql logs and notes")
 
-        conv = Conversions()
+        
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8), sticky="w")
@@ -91,8 +94,8 @@ class Main(tk.Tk):
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
         
-        graph = Graphs()
-        graph.test(frame2)
+        graph = climate_change_graphs()
+        graph.create_graph(frame2, [], [], "Climate Change Graph", "X-axis", "Y-axis")
         
         
         
