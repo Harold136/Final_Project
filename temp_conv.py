@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
@@ -37,8 +36,8 @@ def convert_temperature(value, from_unit, to_unit):
 class climate_change_graphs:
     sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
     co2 = [380,385,390,395,400,405,410,415,420,425]
-
-    
+    biodiversty_affection = []
+    ice_melting = []
     
     def create_graph(self, parent):
         control = ttk.Frame(parent)
@@ -59,8 +58,8 @@ class climate_change_graphs:
         plot_button.grid(row=2, column=0, columnspan=2, pady=10)
 
         self.fig = plt.figure(figsize=(9,6), layout='constrained', dpi=100)
-        ax = self.fig.subplot_mosaic([["signal", "signal"],
-                          ["magnitude", "log_magnitude"],
+        ax = self.fig.subplot_mosaic([["slevel", "slevel"],
+                          ["magnitude", "CO2"],
                           ["phase", "angle"]])
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
@@ -75,20 +74,22 @@ class climate_change_graphs:
             return
 
         self.fig.clear()
-        axes = self.fig.subplot_mosaic([["signal", "signal"],
-                            ["magnitude", "log_magnitude"],
+        axes = self.fig.subplot_mosaic([["slevel", "slevel"],
+                            ["magnitude", "CO2"],
                             ["phase", "angle"]])
 
-        axes["signal"].plot(sea_level, color="blue", marker="o")
-        axes["signal"].set_title("Global Sea Level Rise")
-        axes["signal"].set_ylabel("mm")
-        axes["signal"].grid(True)
+        axes["slevel"].plot(sea_level, color="blue", marker="o")
+        axes["slevel"].set_title("Global Sea Level Rise")
+        axes["slevel"].set_ylabel("idk")
+        axes["slevel"].grid(True)
 
-        axes["log_magnitude"].plot(co2, color="green", marker="^")
-        axes["log_magnitude"].set_title("Atmospheric CO2 (ppm)")
-        axes["log_magnitude"].set_ylabel("ppm")
-        axes["log_magnitude"].grid(True)
+        axes["CO2"].plot(co2, color="green", marker="^")
+        axes["CO2"].set_title("Atmospheric CO2 (ppm)")
+        axes["CO2"].set_ylabel("idk")
+        axes["CO2"].grid(True)
 
+        
+        
 
         self.canvas.draw()
    
@@ -102,7 +103,7 @@ class Main(tk.Tk):
     
     def __init__(self):
         super().__init__()
-        self.geometry("900x600")
+        self.geometry("800x800")
         self.title("Temperature Converter")
         self.configure(bg = 'grey')
         notebook = ttk.Notebook(self)

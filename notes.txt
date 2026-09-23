@@ -28,3 +28,7 @@ tempeture Ice and the metrics it will be in
 
 
 ADD A subplot mosiac instead of multiple lines to give more interaction
+
+
+When doing the matplot stuff I referenced https://matplotlib.org/stable/index.html
+because its newer to me
