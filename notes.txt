@@ -25,3 +25,6 @@ I do not know how to change it. Will make some kind of simulator other than clim
 Some more things about the graphs would default plots like sea level and co2 leveks
 tempeture Ice and the metrics it will be in 
 9/17
+
+
+ADD A subplot mosiac instead of multiple lines to give more interaction

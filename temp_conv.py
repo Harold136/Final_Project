@@ -1,4 +1,4 @@
-from logging import root
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
@@ -35,18 +35,63 @@ def convert_temperature(value, from_unit, to_unit):
 
 
 class climate_change_graphs:
-   def create_graph(self, parent, x_data, y_data, title, x_label, y_label):
-        fig = plt.Figure(figsize=(9, 6), dpi=100)
-        ax = fig.add_subplot(111)
-        
-        x_data = [1,2,3]
-        y_data = [1,4,9]
-        ax.plot(x_data, y_data)
-        canvas = FigureCanvasTkAgg(fig, master=parent)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        return canvas
+    sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
+    co2 = [380,385,390,395,400,405,410,415,420,425]
+
     
+    
+    def create_graph(self, parent):
+        control = ttk.Frame(parent)
+        control.pack(side=tk.TOP, fill="x", padx = 10, pady = 10)
+
+
+        ttk.Label(control, text="Seak Level (mm):").grid(row=0, column=0, padx=(0, 8), sticky="w")
+        self.sea_level_entry = ttk.Entry(control, width=12)
+        self.sea_level_entry.insert(0, ", ".join(map(str, self.sea_level)))
+        self.sea_level_entry.grid(row=0, column=1)
+
+        ttk.Label(control, text="CO2 (ppm):").grid(row=1, column=0, padx=(0, 8), sticky="w")
+        self.co2_entry = ttk.Entry(control, width=12)
+        self.co2_entry.insert(0, ", ".join(map(str, self.co2)))
+        self.co2_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        plot_button = ttk.Button(control, text="Plot Graph", command=self.update_plot)
+        plot_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+        self.fig = plt.figure(figsize=(9,6), layout='constrained', dpi=100)
+        ax = self.fig.subplot_mosaic([["signal", "signal"],
+                          ["magnitude", "log_magnitude"],
+                          ["phase", "angle"]])
+
+        self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        self.update_plot()
+
+    def update_plot(self):
+        try:
+            sea_level = list(map(float, self.sea_level_entry.get().split(",")))
+            co2 = list(map(float, self.co2_entry.get().split(",")))
+        except ValueError:
+            return
+
+        self.fig.clear()
+        axes = self.fig.subplot_mosaic([["signal", "signal"],
+                            ["magnitude", "log_magnitude"],
+                            ["phase", "angle"]])
+
+        axes["signal"].plot(sea_level, color="blue", marker="o")
+        axes["signal"].set_title("Global Sea Level Rise")
+        axes["signal"].set_ylabel("mm")
+        axes["signal"].grid(True)
+
+        axes["log_magnitude"].plot(co2, color="green", marker="^")
+        axes["log_magnitude"].set_title("Atmospheric CO2 (ppm)")
+        axes["log_magnitude"].set_ylabel("ppm")
+        axes["log_magnitude"].grid(True)
+
+
+        self.canvas.draw()
+   
        
 
 class Data(tk.Tk):
@@ -95,7 +140,7 @@ class Main(tk.Tk):
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
         
         graph = climate_change_graphs()
-        graph.create_graph(frame2, [], [], "Climate Change Graph", "X-axis", "Y-axis")
+        graph.create_graph(frame2)
         
         
         
