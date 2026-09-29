@@ -36,23 +36,33 @@ def convert_temperature(value, from_unit, to_unit):
 class climate_change_graphs:
     sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
     co2 = [380,385,390,395,400,405,410,415,420,425]
-    biodiversty_affection = []
-    ice_melting = []
+    biodiversty_affection = [1,4,65,67,7,8,98,9]
+    ice_melting = [12,1,4,5,6,7]
     
     def create_graph(self, parent):
         control = ttk.Frame(parent)
         control.pack(side=tk.TOP, fill="x", padx = 10, pady = 10)
 
 
-        ttk.Label(control, text="Seak Level (mm):").grid(row=0, column=0, padx=(0, 8), sticky="w")
+        ttk.Label(control, text="Sea Level:").grid(row=0, column=0, padx=(0, 8), sticky="w")
         self.sea_level_entry = ttk.Entry(control, width=12)
         self.sea_level_entry.insert(0, ", ".join(map(str, self.sea_level)))
         self.sea_level_entry.grid(row=0, column=1)
 
-        ttk.Label(control, text="CO2 (ppm):").grid(row=1, column=0, padx=(0, 8), sticky="w")
+        ttk.Label(control, text="CO2:").grid(row=0, column=2, padx=(0, 8), sticky="w")
         self.co2_entry = ttk.Entry(control, width=12)
         self.co2_entry.insert(0, ", ".join(map(str, self.co2)))
-        self.co2_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.co2_entry.grid(row=0, column=3, padx=5, pady=5)
+        
+        ttk.Label(control, text="Biodiversty :").grid(row=1, column=2, padx=(0, 8), sticky="w")
+        self.biodiversty = ttk.Entry(control, width=12)
+        self.biodiversty.insert(0, ", ".join(map(str, self.biodiversty_affection)))
+        self.biodiversty.grid(row=1, column=3, padx=5, pady=5)
+        
+        ttk.Label(control, text="Ice melting :").grid(row=1, column=0, padx=(0, 8), sticky="w")
+        self.ice = ttk.Entry(control, width=12)
+        self.ice.insert(0, ", ".join(map(str, self.ice_melting)))
+        self.ice.grid(row=1, column=1, padx=5, pady=5)
 
         plot_button = ttk.Button(control, text="Plot Graph", command=self.update_plot)
         plot_button.grid(row=2, column=0, columnspan=2, pady=10)
@@ -70,6 +80,8 @@ class climate_change_graphs:
         try:
             sea_level = list(map(float, self.sea_level_entry.get().split(",")))
             co2 = list(map(float, self.co2_entry.get().split(",")))
+            biodiversty = list(map(float, self.biodiversty.get().split(",")))
+            ice_melting = list(map(float, self.ice.get().split(",")))
         except ValueError:
             return
 
@@ -83,19 +95,31 @@ class climate_change_graphs:
         axes["slevel"].set_ylabel("idk")
         axes["slevel"].grid(True)
 
-        axes["CO2"].plot(co2, color="green", marker="^")
+        axes["CO2"].plot(co2, color="red", marker="^")
         axes["CO2"].set_title("Atmospheric CO2 (ppm)")
         axes["CO2"].set_ylabel("idk")
         axes["CO2"].grid(True)
 
+        axes["phase"].plot(ice_melting, color="teal", marker="^")
+        axes["phase"].set_title("Biodiversty ")
+        axes["phase"].set_ylabel("idk")
+        axes["phase"].grid(True)
         
+        axes["angle"].plot(biodiversty, color="green", marker="^")
+        axes["angle"].set_title("Ice Melting")
+        axes["angle"].set_ylabel("idk")
+        axes["angle"].grid(True)
         
+        axes["magnitude"].plot(co2, color="green", marker="^")
+        axes["magnitude"].set_title("Atmospheric CO2 (ppm)")
+        axes["magnitude"].set_ylabel("idk")
+        axes["magnitude"].grid(True)
 
         self.canvas.draw()
    
        
 
-class Data(tk.Tk):
+class Data:
     pass
 
 
