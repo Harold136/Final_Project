@@ -92,23 +92,28 @@ class climate_change_graphs:
 
         axes["slevel"].plot(sea_level, color="blue", marker="o")
         axes["slevel"].set_title("Global Sea Level Rise")
-        axes["slevel"].set_ylabel("idk")
+        axes["slevel"].set_ylabel("Sea_level")
         axes["slevel"].grid(True)
-
+        axes["slevel"].set_xlabel("Over Years")
+        
         axes["CO2"].plot(co2, color="red", marker="^")
         axes["CO2"].set_title("Atmospheric CO2 (ppm)")
-        axes["CO2"].set_ylabel("idk")
+        axes["CO2"].set_ylabel("ppm")
         axes["CO2"].grid(True)
-
+        axes["CO2"].set_xlabel("Over Years")
+        
         axes["phase"].plot(ice_melting, color="teal", marker="^")
         axes["phase"].set_title("Biodiversty ")
-        axes["phase"].set_ylabel("idk")
+        axes["phase"].set_ylabel("degrading life")
         axes["phase"].grid(True)
+        axes["phase"].set_xlabel("Over Years")
+        
         
         axes["angle"].plot(biodiversty, color="green", marker="^")
         axes["angle"].set_title("Ice Melting")
-        axes["angle"].set_ylabel("idk")
+        axes["angle"].set_ylabel("Per inch")
         axes["angle"].grid(True)
+        axes["angle"].set_xlabel("Over Years")
         
         axes["magnitude"].plot(co2, color="green", marker="^")
         axes["magnitude"].set_title("Atmospheric CO2 (ppm)")
