@@ -5,10 +5,17 @@ from tkinter import font
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import sqlalchemy as sa
+
+conn = sa.create_engine('sqlite://')
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
-    pass
+    def create_sim(self, parent):
+        control = ttk.Frame(parent)
+        horizontal_scale = Scale(control, from_=0, to=42)
+        horizontal_scale.pack()
+       
 
     
 def convert_temperature(value, from_unit, to_unit):
@@ -131,6 +138,7 @@ class Data:
 class Main(tk.Tk):
     
     def __init__(self):
+        
         super().__init__()
         self.geometry("800x800")
         self.title("Temperature Converter")
@@ -142,12 +150,12 @@ class Main(tk.Tk):
         frame2 = ttk.Frame(notebook, width=900, height=600)
         frame3 = ttk.Frame(notebook, width=900, height=600)
         notebook.add(frame1, text="Conversions and Simulator")
-        notebook.add(frame2, text="Graphs and climate simulator")
+        notebook.add(frame2, text="Climate Graphs")
         notebook.add(frame3, text="Sql logs and notes")
 
         
-        
         basic_font = font.Font(family ="Times New Roman", size=12)
+        
         ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8), sticky="w")
         value_entry = ttk.Entry(frame1, width=12)
         value_entry.insert(0, "100")
@@ -169,6 +177,9 @@ class Main(tk.Tk):
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
         
+        
+        simulators = simulator()
+        simulators.create_sim(frame1)
         graph = climate_change_graphs()
         graph.create_graph(frame2)
         
