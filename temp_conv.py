@@ -6,8 +6,16 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
+from sqlalchemy import Column, Integer, Float, String, DateTime 
+from sqlalchemy.orm import declarative_base, sessionmaker
+import os
+from datetime import datetime
 
-conn = sa.create_engine('sqlite://')
+Base = declarative_base()
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "climate_data.db")
+engine = sa.create_engine(f"sqlite:///{DB_PATH}", echo=False)
+Session_local = sessionmaker(bind=engine )
+Base.metadata.create_all(bind=engine)
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
@@ -128,12 +136,27 @@ class climate_change_graphs:
         axes["magnitude"].grid(True)
 
         self.canvas.draw()
-   
-       
 
-class Data:
-    pass
+class LogEntry(Base):
+    __tablename__ = 'log_entrois'
+    id = Column(Integer, primary_key=True)
+    action = Column(String(200), nullable=False)
+    details = Column(Text, default="")
+    created_at = Column(DateTime, default=sa.func.now(), nullable=False)
+    
+class Data(Base):
+  
+    def log_event(action, details=""):
+        session = Session_Local()
+        try:
+            entry = LogEntry(action=action, details= details, created_at = datetime.now())
+            session.add(entry)
+            session.commit()
+        finally:
+            session.close()
 
+    def get_recents(limit=8):
+        session = Session_Local()
 
 class Main(tk.Tk):
     

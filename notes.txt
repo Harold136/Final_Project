@@ -31,4 +31,7 @@ ADD A subplot mosiac instead of multiple lines to give more interaction
 
 
 When doing the matplot stuff I referenced https://matplotlib.org/stable/index.html
-because its newer to me
+because it was newer to me
+
+10/3 I started on the sql and instead of normal i found orm which is the same in a way 
+using this I can officially start the sql and maybe finish half of it
