@@ -6,16 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
-from sqlalchemy import Column, Integer, Float, String, DateTime 
-from sqlalchemy.orm import declarative_base, sessionmaker
-import os
-from datetime import datetime
-
-Base = declarative_base()
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "climate_data.db")
-engine = sa.create_engine(f"sqlite:///{DB_PATH}", echo=False)
-Session_local = sessionmaker(bind=engine )
-Base.metadata.create_all(bind=engine)
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
@@ -23,6 +13,17 @@ class simulator():
         control = ttk.Frame(parent)
         horizontal_scale = Scale(control, from_=0, to=42)
         horizontal_scale.pack()
+        
+        
+        
+        self.fig = plt.figure(figsize=(9,6), layout='constrained', dpi=100)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        
+    def update_sim():
+        pass
+    
+    
        
 
     
@@ -57,8 +58,8 @@ class climate_change_graphs:
     def create_graph(self, parent):
         control = ttk.Frame(parent)
         control.pack(side=tk.TOP, fill="x", padx = 10, pady = 10)
-
-
+        
+        
         ttk.Label(control, text="Sea Level:").grid(row=0, column=0, padx=(0, 8), sticky="w")
         self.sea_level_entry = ttk.Entry(control, width=12)
         self.sea_level_entry.insert(0, ", ".join(map(str, self.sea_level)))
@@ -136,27 +137,49 @@ class climate_change_graphs:
         axes["magnitude"].grid(True)
 
         self.canvas.draw()
+   
+       
 
-class LogEntry(Base):
-    __tablename__ = 'log_entrois'
-    id = Column(Integer, primary_key=True)
-    action = Column(String(200), nullable=False)
-    details = Column(Text, default="")
-    created_at = Column(DateTime, default=sa.func.now(), nullable=False)
+class Data:
     
-class Data(Base):
-  
-    def log_event(action, details=""):
-        session = Session_Local()
-        try:
-            entry = LogEntry(action=action, details= details, created_at = datetime.now())
-            session.add(entry)
-            session.commit()
-        finally:
-            session.close()
+    engine = sa.create_engine('sqlite:///climate_data.db')
+    connection = engine.connect()
+    table_name = 'climate_data'
+    
+    engine = sa.create_engine('sqlite:///climate_data.db')
+    connection = engine.connect()
+    table_name = 'climate_data'
+    
+    connection.execute(f'''
+        CREATE TABLE IF NOT EXISTS  (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sea_level REAL,
+            co2 REAL,
+            biodiversity REAL,
+            ice_melting REAL
+        )
+    ''')
+        
+    def export_data(self, data):
+        data.to_sql('climate_data', self.connection, if_exists='replace', index=False)
+        data.to_csv('climate_data.csv', index=False)
 
-    def get_recents(limit=8):
-        session = Session_Local()
+        try:
+            self.connection.execute('SELECT * FROM climate_data')
+            print("Data exported successfully.")
+        except ValueError as e:
+            print(f"Error exporting data: {e}")
+
+    def print_data(self):
+        pass
+
+    
+    
+
+
+
+        
+
 
 class Main(tk.Tk):
     
@@ -201,8 +224,8 @@ class Main(tk.Tk):
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
         
         
-        simulators = simulator()
-        simulators.create_sim(frame1)
+        # simulators = simulator()
+        # simulators.create_sim(frame1)
         graph = climate_change_graphs()
         graph.create_graph(frame2)
         
