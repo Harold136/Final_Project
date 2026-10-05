@@ -141,37 +141,66 @@ class climate_change_graphs:
        
 
 class Data:
-    
-    engine = sa.create_engine('sqlite:///climate_data.db')
-    connection = engine.connect()
-    table_name = 'climate_data'
-    
-    engine = sa.create_engine('sqlite:///climate_data.db')
-    connection = engine.connect()
-    table_name = 'climate_data'
-    
-    connection.execute(f'''
-        CREATE TABLE IF NOT EXISTS  (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            sea_level REAL,
-            co2 REAL,
-            biodiversity REAL,
-            ice_melting REAL
-        )
-    ''')
+    def __init__(self):
+        self.log_widget = None
+        self.engine = sa.create_engine('sqlite:///climate_data.db')
+        self.connection = self.engine.connect()
+        self.table_name = 'climate_data'
         
+       
+            
+        self.connection.execute(sa.text(f'''
+                CREATE TABLE IF NOT EXISTS {self.table_name} (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    sea_level REAL,
+                    co2 REAL,
+                    biodiversity REAL,
+                    ice_melting REAL
+                )
+            '''))
+        self.connection.commit()
+
     def export_data(self, data):
-        data.to_sql('climate_data', self.connection, if_exists='replace', index=False)
+        data.to_sql(self.table_name, self.connection, if_exists='replace', index=False)
         data.to_csv('climate_data.csv', index=False)
 
         try:
-            self.connection.execute('SELECT * FROM climate_data')
+            self.connection.execute(sa.text('SELECT * FROM climate_data'))
             print("Data exported successfully.")
         except ValueError as e:
             print(f"Error exporting data: {e}")
 
-    def print_data(self):
-        pass
+    def print_data(self, parent=None):
+        if parent is not None:
+            if self.log_widget is None:
+                self.log_widget = tk.Text(parent, wrap=tk.WORD, height=20)
+                self.log_widget.pack(fill=tk.BOTH, expand=True)
+
+            self.log_widget.config(state=tk.NORMAL)
+            self.log_widget.delete(1.0, tk.END)
+            self.log_widget.insert(tk.END, "Climate Data Logs:\n")
+
+            try:
+                result = self.connection.execute(sa.text('SELECT * FROM climate_data'))
+                rows = result.fetchall()
+                if not rows:
+                    self.log_widget.insert(tk.END, "No data found in the database.\n")
+                else:
+
+                    for row in result:
+                        self.log_widget.insert("end", f"{row}\n")
+
+            except ValueError as e:
+                self.log_widget.insert(tk.END, f"Error retrieving data: {e}\n")
+            self.log_widget.config(state=tk.DISABLED)
+            return
+        try:
+            result = self.connection.execute(sa.text('SELECT * FROM climate_data'))
+            for row in result:
+                print(row)
+        except ValueError as e:
+            print(f"Error retrieving data: {e}")
+        
 
     
     
@@ -222,7 +251,25 @@ class Main(tk.Tk):
         
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
+        data = Data()
+        def log_it():
+            try:
+                value = float(value_entry.get())
+                converted_value = round(convert_temperature(value, from_var.get(), to_var.get()), 2)
+            except ValueError:
+                result_label.config(text="Invalid input. Please enter a numeric value.")
+                return
+            result_label.config(text=f"Result: {round(converted_value, 2)} {to_var.get()}")
+            data.insert_log(
+                'conversion',
+                sea_level = value,
+                co2 = value,
+                biodiversity = value,
+                ice_melting = converted_value
+            )
         
+        
+        data.print_data(frame3)
         
         # simulators = simulator()
         # simulators.create_sim(frame1)
