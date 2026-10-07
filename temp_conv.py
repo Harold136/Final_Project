@@ -6,26 +6,23 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
+from random import randint
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
     def create_sim(self, parent):
-        control = ttk.Frame(parent)
-        horizontal_scale = Scale(control, from_=0, to=42)
-        horizontal_scale.pack()
+        self = ttk.Frame(parent)
         
+        self.fig = plt.figure(figsize=(9,6))
+        ax = self.fig.subplot_mosaic([["slevel", "slevel"],
+                          ["magnitude", "CO2"],
+                          ["phase", "angle"]])
         
-        
-        self.fig = plt.figure(figsize=(9,6), layout='constrained', dpi=100)
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        self.canvas.get_tk_widget().grid(row=8,column=7)
         
     def update_sim():
         pass
-    
-    
-       
-
     
 def convert_temperature(value, from_unit, to_unit):
     if from_unit == to_unit:
@@ -44,10 +41,6 @@ def convert_temperature(value, from_unit, to_unit):
         return celsius_value + 273.15
     elif to_unit == "Fahrenheit":
         return (celsius_value * 9/5) + 32
-
-   
-    
-
 
 class climate_change_graphs:
     sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
@@ -138,8 +131,6 @@ class climate_change_graphs:
 
         self.canvas.draw()
    
-       
-
 class Data:
     def __init__(self):
         self.log_widget = None
@@ -152,14 +143,18 @@ class Data:
         self.connection.execute(sa.text(f'''
                 CREATE TABLE IF NOT EXISTS {self.table_name} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    log_type TEXT NOT NULL,
+                    details TEXT NOT NULL,
                     sea_level REAL,
                     co2 REAL,
                     biodiversity REAL,
-                    ice_melting REAL
+                    ice_melting REAL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             '''))
+        
         self.connection.commit()
-
+        
     def export_data(self, data):
         data.to_sql(self.table_name, self.connection, if_exists='replace', index=False)
         data.to_csv('climate_data.csv', index=False)
@@ -171,6 +166,7 @@ class Data:
             print(f"Error exporting data: {e}")
 
     def print_data(self, parent=None):
+    
         if parent is not None:
             if self.log_widget is None:
                 self.log_widget = tk.Text(parent, wrap=tk.WORD, height=20)
@@ -183,32 +179,45 @@ class Data:
             try:
                 result = self.connection.execute(sa.text('SELECT * FROM climate_data'))
                 rows = result.fetchall()
+                print('working here')
                 if not rows:
                     self.log_widget.insert(tk.END, "No data found in the database.\n")
                 else:
-
-                    for row in result:
+                    for row in rows:
                         self.log_widget.insert("end", f"{row}\n")
 
             except ValueError as e:
                 self.log_widget.insert(tk.END, f"Error retrieving data: {e}\n")
-            self.log_widget.config(state=tk.DISABLED)
+                self.log_widget.config(state=tk.DISABLED)
             return
+        
         try:
             result = self.connection.execute(sa.text('SELECT * FROM climate_data'))
+            print('working fkjh')
             for row in result:
                 print(row)
         except ValueError as e:
             print(f"Error retrieving data: {e}")
         
-
-    
-    
-
-
-
+    def insert_log(self, log_type, details, sea_level=None, co2=None, biodiversity=None, ice_melting=None):
+        insert_query = f'''
+            INSERT INTO {self.table_name}
+                (log_type, details, sea_level, co2, biodiversity, ice_melting)
+            VALUES (:log_type, :details, :sea_level, :co2, :biodiversity, :ice_melting)
+        '''
+        self.connection.execute(
+            sa.text(insert_query),
+            {
+                'log_type': log_type,
+                'details': details,
+                'sea_level': sea_level,
+                'co2': co2,
+                'biodiversity': biodiversity,
+                'ice_melting': ice_melting,
+            },
+        )
+        self.connection.commit()
         
-
 
 class Main(tk.Tk):
     
@@ -224,6 +233,8 @@ class Main(tk.Tk):
         frame1 = ttk.Frame(notebook, width=900, height=600)
         frame2 = ttk.Frame(notebook, width=900, height=600)
         frame3 = ttk.Frame(notebook, width=900, height=600)
+        
+        
         notebook.add(frame1, text="Conversions and Simulator")
         notebook.add(frame2, text="Climate Graphs")
         notebook.add(frame3, text="Sql logs and notes")
@@ -253,36 +264,49 @@ class Main(tk.Tk):
         result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
         data = Data()
         def log_it():
+            value = value_entry.get()
+            from_unit = from_var.get()
+            to_unit = to_var.get()
+
             try:
                 value = float(value_entry.get())
                 converted_value = round(convert_temperature(value, from_var.get(), to_var.get()), 2)
+                print('working')
             except ValueError:
                 result_label.config(text="Invalid input. Please enter a numeric value.")
+                data.insert_log(
+                    'conversion',
+                    f"from={from_unit}, to={to_unit}, value={value_entry.get()}, status=invalid",
+                    sea_level=None,
+                    co2=None,
+                    biodiversity=None,
+                    ice_melting=None,
+                )
                 return
+
             result_label.config(text=f"Result: {round(converted_value, 2)} {to_var.get()}")
             data.insert_log(
                 'conversion',
-                sea_level = value,
-                co2 = value,
-                biodiversity = value,
-                ice_melting = converted_value
+                f"from={from_unit}, to={to_unit}, value={value}, status=success",
+                sea_level=value,
+                co2=value,
+                biodiversity=value,
+                ice_melting=converted_value,
             )
         
         
+        convert_button = ttk.Button(frame1, text="Convert", command=log_it)
+        convert_button.grid(row=0, column=6, sticky="w")
         data.print_data(frame3)
-        
-        # simulators = simulator()
-        # simulators.create_sim(frame1)
-        graph = climate_change_graphs()
-        graph.create_graph(frame2)
-        
-        
         
        
 
+       
+        simulators = simulator()
+        simulators.create_sim(frame1)
+        graph = climate_change_graphs()
+        graph.create_graph(frame2)
         
-   
-
 if __name__ == "__main__":
     app = Main()
     app.mainloop()

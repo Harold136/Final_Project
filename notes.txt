@@ -36,3 +36,11 @@ because it was newer to me
 10/3 I started on the sql and instead of normal i found orm which is the same in a way 
 using this I can officially start the sql and maybe finish half of it
 kfl;dhfj
+
+My good ness after many trails is want not the conversion it was the database
+some explainations for the sql
+The insert_log functuib inserts a new row into the climate data and the querey
+uses all the values and uses placeholder and the connections helps with safe execution
+Log it is what the user sees on the frame
+whenever the user hits convert it extracts values and uses a try and except to make sure whatevers 
+there is valid
