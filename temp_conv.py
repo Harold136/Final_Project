@@ -7,19 +7,19 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
 from random import randint
+import numpy as np
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
     def create_sim(self, parent):
         self = ttk.Frame(parent)
         
-        self.fig = plt.figure(figsize=(9,6))
-        ax = self.fig.subplot_mosaic([["slevel", "slevel"],
-                          ["magnitude", "CO2"],
-                          ["phase", "angle"]])
+        self.fig = Figure(figsize=(5, 4), dpi=100)
+        t = np.arange(0, 3, .01)
+        self.fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
         
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().grid(row=8,column=7)
+        self.canvas.get_tk_widget().grid(row=0,column=0)
         
     def update_sim():
         pass
@@ -143,8 +143,8 @@ class Data:
         self.connection.execute(sa.text(f'''
                 CREATE TABLE IF NOT EXISTS {self.table_name} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    log_type TEXT NOT NULL,
-                    details TEXT NOT NULL,
+                    log_type TEXT,
+                    details TEXT,
                     sea_level REAL,
                     co2 REAL,
                     biodiversity REAL,
@@ -152,7 +152,6 @@ class Data:
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             '''))
-        
         self.connection.commit()
         
     def export_data(self, data):
@@ -242,26 +241,26 @@ class Main(tk.Tk):
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         
-        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8), sticky="w")
+        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=4, column=0, padx=(0, 8), sticky="S")
         value_entry = ttk.Entry(frame1, width=12)
         value_entry.insert(0, "100")
-        value_entry.grid(row=0, column=1, padx=(0, 14), sticky="w")
+        value_entry.grid(row=4, column=1, padx=(0, 14), sticky="S")
 
-        ttk.Label(frame1, text="From:", font=basic_font).grid(row=0, column=2, padx=(0, 6), sticky="w")
+        ttk.Label(frame1, text="From:", font=basic_font).grid(row=4, column=2, padx=(0, 6), sticky="S")
         from_var = tk.StringVar(value="Celsius")
         from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
-        from_menu.grid(row=0, column=3, padx=(0, 14), sticky="w")
+        from_menu.grid(row=4, column=3, padx=(0, 14), sticky="S")
 
-        ttk.Label(frame1, text="To:", font=basic_font).grid(row=0, column=4, padx=(0, 6), sticky="w")
+        ttk.Label(frame1, text="To:", font=basic_font).grid(row=4, column=4, padx=(0, 6), sticky="S")
         to_var = tk.StringVar(value="Kelvin")
         to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
-        to_menu.grid(row=0, column=5, padx=(0, 14), sticky="w")
+        to_menu.grid(row=4, column=5, padx=(0, 14), sticky="S")
         
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=0, column=6, sticky="w")
+        convert_button.grid(row=4, column=6, sticky="S")
         
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
-        result_label.grid(row=1, column=0, columnspan=7, sticky="ew", pady=(10, 0))
+        result_label.grid(row=5, column=0, columnspan=7,  pady=(10, 0))
         data = Data()
         def log_it():
             value = value_entry.get()
@@ -296,7 +295,7 @@ class Main(tk.Tk):
         
         
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=0, column=6, sticky="w")
+        convert_button.grid(row=0, column=6)
         data.print_data(frame3)
         
        
