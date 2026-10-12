@@ -6,14 +6,12 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
-from random import randint
 import numpy as np
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
 
 class simulator():
     def create_sim(self, parent):
         self = ttk.Frame(parent)
-        
         self.fig = Figure(figsize=(5, 4), dpi=100)
         t = np.arange(0, 3, .01)
         self.fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
@@ -291,18 +289,21 @@ class Main(tk.Tk):
                 co2=value,
                 biodiversity=value,
                 ice_melting=converted_value,
-            )
-        
-        
+            )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
         convert_button.grid(row=0, column=6)
-        data.print_data(frame3)
-        
-       
-
-       
+        data.print_data(frame3)        
         simulators = simulator()
-        simulators.create_sim(frame1)
+        
+        def simulator_thing():
+            value = convert_button.get()
+            try:
+                value = float(convert_button.get())
+                
+            except:
+                print("NO WORKY")
+       
+        simulators.simulator_thing()
         graph = climate_change_graphs()
         graph.create_graph(frame2)
         
