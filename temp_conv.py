@@ -8,7 +8,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 import sqlalchemy as sa
 import numpy as np
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
-
+# The simulator should have the stu9ff wanted maybe add the sql stuff do the read me and make it look goood. A problem with the 
+#start of the simulator need to do the grid correcty because it is wrong.
 class simulator():
     def create_sim(self, parent):
         self = ttk.Frame(parent)
@@ -17,7 +18,7 @@ class simulator():
         self.fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
         
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().grid(row=0,column=0)
+        self.canvas.get_tk_widget().grid(row=0,column=0, sticky="N")
         
     def update_sim():
         pass
@@ -291,19 +292,11 @@ class Main(tk.Tk):
                 ice_melting=converted_value,
             )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=0, column=6)
+        convert_button.grid(row=4, column=6)
         data.print_data(frame3)        
         simulators = simulator()
-        
-        def simulator_thing():
-            value = convert_button.get()
-            try:
-                value = float(convert_button.get())
-                
-            except:
-                print("NO WORKY")
-       
-        simulators.simulator_thing()
+        simulators.create_sim(frame1)
+     
         graph = climate_change_graphs()
         graph.create_graph(frame2)
         
