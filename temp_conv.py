@@ -6,23 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import sqlalchemy as sa
-import numpy as np
 temperature_options = ["Celsius", "Kelvin", "Fahrenheit"]
-# The simulator should have the stu9ff wanted maybe add the sql stuff do the read me and make it look goood. A problem with the 
-#start of the simulator need to do the grid correcty because it is wrong.
-class simulator():
-    def create_sim(self, parent):
-        self = ttk.Frame(parent)
-        self.fig = Figure(figsize=(5, 4), dpi=100)
-        t = np.arange(0, 3, .01)
-        self.fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
-        
-        self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().grid(row=0,column=0, sticky="N")
-        
-    def update_sim():
-        pass
-    
 def convert_temperature(value, from_unit, to_unit):
     if from_unit == to_unit:
         return value
@@ -41,6 +25,24 @@ def convert_temperature(value, from_unit, to_unit):
     elif to_unit == "Fahrenheit":
         return (celsius_value * 9/5) + 32
 
+    
+class simulator():
+    def create_sim(self, parent):
+        self.fig = Figure(figsize=(5, 4), dpi=100)
+        self.ax = self.fig.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
+        self.canvas.get_tk_widget().grid(row=2,column=0, sticky = "nsew")
+        
+        self.update_sim(100, "Celsius", convert_temperature(100, "Celsius", "Fahrenheit"))
+    
+    
+    def update_sim(self, value, from_unit, converted_value):
+        self.ax.clear()
+        self.ax.plot([from_unit, "Fahrenheit"], [value, converted_value], marker='o')
+        self.ax.set_title("Temperature Conversion")
+        self.ax.grid(True)
+        self.canvas.draw_idle()
+                          
 class climate_change_graphs:
     sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
     co2 = [380,385,390,395,400,405,410,415,420,425]
@@ -231,8 +233,11 @@ class Main(tk.Tk):
         frame1 = ttk.Frame(notebook, width=900, height=600)
         frame2 = ttk.Frame(notebook, width=900, height=600)
         frame3 = ttk.Frame(notebook, width=900, height=600)
-        
-        
+
+        frame1.pack_propagate(False)
+        frame2.pack_propagate(False)
+        frame3.pack_propagate(False)
+
         notebook.add(frame1, text="Conversions and Simulator")
         notebook.add(frame2, text="Climate Graphs")
         notebook.add(frame3, text="Sql logs and notes")
@@ -240,26 +245,28 @@ class Main(tk.Tk):
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         
-        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=4, column=0, padx=(0, 8), sticky="S")
+        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8), sticky="S")
         value_entry = ttk.Entry(frame1, width=12)
         value_entry.insert(0, "100")
-        value_entry.grid(row=4, column=1, padx=(0, 14), sticky="S")
+        value_entry.grid(row=0, column=1, padx=(0, 14), sticky="S")
 
-        ttk.Label(frame1, text="From:", font=basic_font).grid(row=4, column=2, padx=(0, 6), sticky="S")
+        ttk.Label(frame1, text="From:", font=basic_font).grid(row=0, column=2, padx=(0, 6), sticky="S")
         from_var = tk.StringVar(value="Celsius")
         from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
-        from_menu.grid(row=4, column=3, padx=(0, 14), sticky="S")
+        from_menu.grid(row=0, column=3, padx=(0, 14), sticky="S")
 
-        ttk.Label(frame1, text="To:", font=basic_font).grid(row=4, column=4, padx=(0, 6), sticky="S")
+        ttk.Label(frame1, text="To:", font=basic_font).grid(row=0, column=4, padx=(0, 6), sticky="S")
         to_var = tk.StringVar(value="Kelvin")
         to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
-        to_menu.grid(row=4, column=5, padx=(0, 14), sticky="S")
+        to_menu.grid(row=0, column=5, padx=(0, 14), sticky="S")
         
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=4, column=6, sticky="S")
+        convert_button.grid(row=1, column=0, sticky="S")
         
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
         result_label.grid(row=5, column=0, columnspan=7,  pady=(10, 0))
+        simulators = simulator()
+        simulators.create_sim(frame1)
         data = Data()
         def log_it():
             value = value_entry.get()
@@ -272,6 +279,7 @@ class Main(tk.Tk):
                 print('working')
             except ValueError:
                 result_label.config(text="Invalid input. Please enter a numeric value.")
+                simulators.update_sim(value, from_unit, converted_value)
                 data.insert_log(
                     'conversion',
                     f"from={from_unit}, to={to_unit}, value={value_entry.get()}, status=invalid",
@@ -292,10 +300,8 @@ class Main(tk.Tk):
                 ice_melting=converted_value,
             )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=4, column=6)
+        convert_button.grid(row=1, column=0)
         data.print_data(frame3)        
-        simulators = simulator()
-        simulators.create_sim(frame1)
      
         graph = climate_change_graphs()
         graph.create_graph(frame2)
