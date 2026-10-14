@@ -261,10 +261,10 @@ class Main(tk.Tk):
         to_menu.grid(row=0, column=5, padx=(0, 14), sticky="S")
         
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=1, column=0, sticky="S")
+        convert_button.grid(row=0, column=6, sticky="S")
         
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
-        result_label.grid(row=5, column=0, columnspan=7,  pady=(10, 0))
+        result_label.grid(row=1, column=0,  pady=(10, 0))
         simulators = simulator()
         simulators.create_sim(frame1)
         data = Data()
@@ -300,7 +300,7 @@ class Main(tk.Tk):
                 ice_melting=converted_value,
             )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=1, column=0)
+        convert_button.grid(row=0, column=6)
         data.print_data(frame3)        
      
         graph = climate_change_graphs()
