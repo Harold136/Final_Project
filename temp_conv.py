@@ -84,6 +84,7 @@ class climate_change_graphs:
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        
         self.update_plot()
 
     def update_plot(self):
@@ -100,26 +101,26 @@ class climate_change_graphs:
                             ["CO2", "CO2"],
                             ["phase", "angle"]])
 
-        axes["slevel"].plot(sea_level, color="blue", marker="o")
+        axes["slevel"].plot(sea_level, color="blue", marker="x")
         axes["slevel"].set_title("Global Sea Level Rise")
         axes["slevel"].set_ylabel("Sea_level")
         axes["slevel"].grid(True)
         axes["slevel"].set_xlabel("Over Years")
         
-        axes["CO2"].plot(co2, color="red", marker="^")
+        axes["CO2"].plot(co2, color="red", marker="x")
         axes["CO2"].set_title("Atmospheric CO2 (ppm)")
         axes["CO2"].set_ylabel("ppm")
         axes["CO2"].grid(True)
         axes["CO2"].set_xlabel("Over Years")
         
-        axes["phase"].plot(ice_melting, color="teal", marker="^")
+        axes["phase"].plot(ice_melting, color="teal", marker="x")
         axes["phase"].set_title("Biodiversty ")
         axes["phase"].set_ylabel("degrading life")
         axes["phase"].grid(True)
         axes["phase"].set_xlabel("Over Years")
         
         
-        axes["angle"].plot(biodiversty, color="green", marker="^")
+        axes["angle"].plot(biodiversty, color="green", marker="x")
         axes["angle"].set_title("Ice Melting")
         axes["angle"].set_ylabel("Per inch")
         axes["angle"].grid(True)
@@ -230,9 +231,6 @@ class Main(tk.Tk):
         frame2 = ttk.Frame(notebook, width=900, height=600)
         frame3 = ttk.Frame(notebook, width=900, height=600)
 
-        frame1.pack_propagate(False)
-        frame2.pack_propagate(False)
-        frame3.pack_propagate(False)
 
         notebook.add(frame1, text="Conversions")
         notebook.add(frame2, text="Climate Graphs")
@@ -241,26 +239,25 @@ class Main(tk.Tk):
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         
-        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8))
+        ttk.Label(frame1, text="Value:", font=basic_font).grid(row=12, column=0)
         value_entry = ttk.Entry(frame1, width=12)
         value_entry.insert(0, "100")
-        value_entry.grid(row=0, column=1, padx=(0, 14))
-
-        ttk.Label(frame1, text="From:", font=basic_font).grid(row=0, column=2, padx=(0, 6))
+        value_entry.grid(row=12, column=1)
+        ttk.Label(frame1, text="From:", font=basic_font).grid(row=12, column=2)
         from_var = tk.StringVar(value="Celsius")
         from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
-        from_menu.grid(row=0, column=3, padx=(0, 14))
+        from_menu.grid(row=12, column=3)
 
-        ttk.Label(frame1, text="To:", font=basic_font).grid(row=0, column=4, padx=(0, 6))
+        ttk.Label(frame1, text="To:", font=basic_font).grid(row=12, column=4)
         to_var = tk.StringVar(value="Kelvin")
         to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
-        to_menu.grid(row=0, column=5, padx=(0, 14))
+        to_menu.grid(row=12, column=5)
         
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=0, column=6)
+        convert_button.grid(row=12, column=6)
         
-        result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
-        result_label.grid(row=1, column=0,  pady=(10, 0))
+        result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w",  font=basic_font)
+        result_label.grid(row=13, column=0,  pady=(10, 0))
         simulators = simulator()
         simulators.create_sim(frame1)
         data = Data()
@@ -296,7 +293,7 @@ class Main(tk.Tk):
                 ice_melting=converted_value,
             )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=0, column=6)
+        convert_button.grid(row=12, column=6)
         data.print_data(frame3)        
      
         graph = climate_change_graphs()
