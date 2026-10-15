@@ -31,17 +31,27 @@ class simulator():
         self.fig = Figure(figsize=(5, 4), dpi=100)
         self.ax = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().grid(row=5,column=0, sticky = "nsew")
+        self.canvas.get_tk_widget().grid(row=2,column=0,columnspan=8, rowspan=15, sticky = "nsew", padx=10, pady=10)
+        toolbar = NavigationToolbar2Tk(self.canvas, parent, pack_toolbar=False  )
+        toolbar.update()
+        toolbar.grid(row=18, column=0, columnspan=8, sticky="ew", padx=10, pady=10)
         
         self.update_sim(100, "Celsius", convert_temperature(100, "Celsius", "Fahrenheit"))
     
     
     def update_sim(self, value, from_unit, converted_value):
         self.ax.clear()
-        self.ax.plot([from_unit, "Fahrenheit"], [value, converted_value], marker='o')
-        self.ax.set_title("Temperature Conversion")
+        labels = []
+        values = []
+        for unit in temperature_options:
+            temp = convert_temperature(value, from_unit, unit)
+            labels.append(unit)
+            values.append(temp)
+
+        self.ax.plot(labels, values, marker='o', linewidth=3, color='blue')
+        self.ax.set_title(f"Temperature Coparison")
+        self.ax.set_ylabel("Temperature")
         self.ax.grid(True)
-        self.canvas.draw_idle()
                           
 class climate_change_graphs:
     sea_level = [1,2,3,4,5,6,7,7,8,9,9,1,91]
@@ -239,25 +249,53 @@ class Main(tk.Tk):
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         
-        ttk.Label(frame1, text="Value:", font=basic_font).grid(row=12, column=0)
-        value_entry = ttk.Entry(frame1, width=12)
-        value_entry.insert(0, "100")
-        value_entry.grid(row=12, column=1)
-        ttk.Label(frame1, text="From:", font=basic_font).grid(row=12, column=2)
-        from_var = tk.StringVar(value="Celsius")
-        from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
-        from_menu.grid(row=12, column=3)
+        # ttk.Label(frame1, text="Value:", font=basic_font).grid(row=12, column=0)
+        # value_entry = ttk.Entry(frame1, width=12)
+        # value_entry.insert(0, "100")
+        # value_entry.grid(row=12, column=1)
+        # ttk.Label(frame1, text="From:", font=basic_font).grid(row=12, column=2)
+        # from_var = tk.StringVar(value="Celsius")
+        # from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
+        # from_menu.grid(row=12, column=3)
 
-        ttk.Label(frame1, text="To:", font=basic_font).grid(row=12, column=4)
+        # ttk.Label(frame1, text="To:", font=basic_font).grid(row=12, column=4)
+        # to_var = tk.StringVar(value="Kelvin")
+        # to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
+        # to_menu.grid(row=12, column=5)
+        
+
+        for col in range(8):
+            frame1.grid_columnconfigure(col, weight=1)
+
+        for row in range(20):
+            frame1.grid_rowconfigure(row, weight=1)
+
+        controls = ttk.LabelFrame(frame1, text="Temperature Conversion", padding=10)
+        controls.grid(row=0, column=0, columnspan=8, sticky='ew', padx=10, pady=10)
+
+        ttk.Label(controls, text="Value:", font=basic_font).grid(row=0, column=0)
+        value_entry = ttk.Entry(controls, width=12)
+        value_entry.insert(0, "100")
+        value_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        ttk.Label(controls, text="From:", font=basic_font).grid(row=1, column=0)
+        from_var = tk.StringVar(value="Celsius")
+        from_menu = ttk.OptionMenu(controls, from_var, from_var.get(), *temperature_options)
+        from_menu.grid(row=0, column=2, padx=5, pady=5)
+
+        ttk.Label(controls, text="To:", font=basic_font).grid(row=0, column=3)
         to_var = tk.StringVar(value="Kelvin")
-        to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
-        to_menu.grid(row=12, column=5)
-        
+        to_menu = ttk.OptionMenu(controls, to_var, to_var.get(), *temperature_options)
+        to_menu.grid(row=0, column=5, padx=5, pady=5)
+
+        controls = ttk.LabelFrame(frame1, text="Temperature Conversion", padding=10)
+        controls.grid(row=0,column=0,columnspan=8, sticky = 'ew', padx=10, pady=10)
+
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=12, column=6)
+        convert_button.grid(row=1, column=2, padx=5, pady=5)
         
-        result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w",  font=basic_font)
-        result_label.grid(row=13, column=0,  pady=(10, 0))
+        result_label = ttk.Label(frame1,  font=basic_font, text="Results will appear here", anchor="w")
+        result_label.grid(row=1, column=0, columnspan=8, sticky="ew", padx=10, pady=10)
         simulators = simulator()
         simulators.create_sim(frame1)
         data = Data()
@@ -283,7 +321,7 @@ class Main(tk.Tk):
                 )
                 return
 
-            result_label.config(text=f"Result: {round(converted_value, 2)} {to_var.get()}")
+            simulators.update_sim(value, from_unit, converted_value)
             data.insert_log(
                 'conversion',
                 f"from={from_unit}, to={to_unit}, value={value}, status=success",
@@ -293,7 +331,10 @@ class Main(tk.Tk):
                 ice_melting=converted_value,
             )        
         convert_button = ttk.Button(frame1, text="Convert", command=log_it)
-        convert_button.grid(row=12, column=6)
+        convert_button.grid(row=1, column=2, padx=5, pady=5)
+        value_entry.bind("<Return>", lambda event: log_it())
+        from_var.trace_add("write", lambda *args: log_it())
+        to_var.trace_add("write", lambda *args: log_it())
         data.print_data(frame3)        
      
         graph = climate_change_graphs()
