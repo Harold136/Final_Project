@@ -31,7 +31,7 @@ class simulator():
         self.fig = Figure(figsize=(5, 4), dpi=100)
         self.ax = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
-        self.canvas.get_tk_widget().grid(row=2,column=0, sticky = "nsew")
+        self.canvas.get_tk_widget().grid(row=5,column=0, sticky = "nsew")
         
         self.update_sim(100, "Celsius", convert_temperature(100, "Celsius", "Fahrenheit"))
     
@@ -97,7 +97,7 @@ class climate_change_graphs:
 
         self.fig.clear()
         axes = self.fig.subplot_mosaic([["slevel", "slevel"],
-                            ["magnitude", "CO2"],
+                            ["CO2", "CO2"],
                             ["phase", "angle"]])
 
         axes["slevel"].plot(sea_level, color="blue", marker="o")
@@ -124,11 +124,7 @@ class climate_change_graphs:
         axes["angle"].set_ylabel("Per inch")
         axes["angle"].grid(True)
         axes["angle"].set_xlabel("Over Years")
-        
-        axes["magnitude"].plot(co2, color="green", marker="^")
-        axes["magnitude"].set_title("Atmospheric CO2 (ppm)")
-        axes["magnitude"].set_ylabel("idk")
-        axes["magnitude"].grid(True)
+      
 
         self.canvas.draw()
    
@@ -238,30 +234,30 @@ class Main(tk.Tk):
         frame2.pack_propagate(False)
         frame3.pack_propagate(False)
 
-        notebook.add(frame1, text="Conversions and Simulator")
+        notebook.add(frame1, text="Conversions")
         notebook.add(frame2, text="Climate Graphs")
-        notebook.add(frame3, text="Sql logs and notes")
+        notebook.add(frame3, text="SQL logs")
 
         
         basic_font = font.Font(family ="Times New Roman", size=12)
         
-        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8), sticky="S")
+        ttk.Label(frame1, text="Value:",font=basic_font).grid(row=0, column=0, padx=(0, 8))
         value_entry = ttk.Entry(frame1, width=12)
         value_entry.insert(0, "100")
-        value_entry.grid(row=0, column=1, padx=(0, 14), sticky="S")
+        value_entry.grid(row=0, column=1, padx=(0, 14))
 
-        ttk.Label(frame1, text="From:", font=basic_font).grid(row=0, column=2, padx=(0, 6), sticky="S")
+        ttk.Label(frame1, text="From:", font=basic_font).grid(row=0, column=2, padx=(0, 6))
         from_var = tk.StringVar(value="Celsius")
         from_menu = ttk.OptionMenu(frame1, from_var, from_var.get(), *temperature_options)
-        from_menu.grid(row=0, column=3, padx=(0, 14), sticky="S")
+        from_menu.grid(row=0, column=3, padx=(0, 14))
 
-        ttk.Label(frame1, text="To:", font=basic_font).grid(row=0, column=4, padx=(0, 6), sticky="S")
+        ttk.Label(frame1, text="To:", font=basic_font).grid(row=0, column=4, padx=(0, 6))
         to_var = tk.StringVar(value="Kelvin")
         to_menu = ttk.OptionMenu(frame1, to_var, to_var.get(), *temperature_options)
-        to_menu.grid(row=0, column=5, padx=(0, 14), sticky="S")
+        to_menu.grid(row=0, column=5, padx=(0, 14))
         
         convert_button = ttk.Button(frame1,text="Convert", command=lambda: result_label.config(text=f"Result: {round(convert_temperature(float(value_entry.get()), from_var.get(), to_var.get()), 2)} {to_var.get()}"))
-        convert_button.grid(row=0, column=6, sticky="S")
+        convert_button.grid(row=0, column=6)
         
         result_label = tk.Label(frame1, text="Result will appear here", bg="#eef7ff", relief="flat", anchor="w")
         result_label.grid(row=1, column=0,  pady=(10, 0))
